@@ -1,0 +1,6 @@
+﻿Unnamed: 0,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+594,ResNet18,CIFAR-10,1,64,0,0.985,PointNet,ShapeNet,1,64,0,0.9,92,60.958,9810
+435,ResNet18,CIFAR-10,1,64,0,0.948,PPO,LunarLander,1,64,0,1,80.371,49.229,4708
+1078,ResNet18,CIFAR-10,1,64,0,0.589,LSTM,CIFAR-10,1,64,0,0.786,100,82.276,6566
+208,ResNet18,CIFAR-10,1,64,0,0.597,DCGAN,LSUN,1,64,0,0.711,99.554,50.824,5226
+751,ResNet18,CIFAR-10,1,64,0,0.648,ResNet18,CIFAR-10,1,64,0,0.652,98.658,68.513,5342

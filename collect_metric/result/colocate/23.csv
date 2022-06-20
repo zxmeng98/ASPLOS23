@@ -1,0 +1,11 @@
+,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+0,NeuMF-pre,MovieLens,1,64,0,16045.703,NeuMF-pre,MovieLens,1,64,0,16192.544,19.0,4.571,4122
+1,NeuMF-pre,MovieLens,1,64,0,14261.188,NeuMF-pre,MovieLens,1,64,1,11786.83,14.0,3.0,4122
+2,NeuMF-pre,MovieLens,1,64,1,13261.945,NeuMF-pre,MovieLens,1,64,1,13347.359,16.714,3.714,4122
+3,NeuMF-pre,MovieLens,1,64,0,14791.479,NeuMF-pre,MovieLens,1,128,0,30126.143,16.222,3.556,4122
+4,NeuMF-pre,MovieLens,1,64,0,16210.517,NeuMF-pre,MovieLens,1,128,1,30066.977,20.4,4.2,4122
+5,NeuMF-pre,MovieLens,1,64,1,12430.303,NeuMF-pre,MovieLens,1,128,0,32196.294,16.167,3.667,4122
+6,NeuMF-pre,MovieLens,1,64,1,10722.053,NeuMF-pre,MovieLens,1,128,1,26140.137,13.75,3.0,4122
+7,NeuMF-pre,MovieLens,1,128,0,35990.024,NeuMF-pre,MovieLens,1,128,0,30361.132,20.857,4.714,4122
+8,NeuMF-pre,MovieLens,1,128,0,31016.484,NeuMF-pre,MovieLens,1,128,1,19625.56,16.2,3.2,4122
+9,NeuMF-pre,MovieLens,1,128,1,23954.94,NeuMF-pre,MovieLens,1,128,1,26733.171,18.167,3.667,4122

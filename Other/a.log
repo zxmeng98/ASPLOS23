@@ -1,0 +1,27 @@
+Model: mobilenet_v3_small
+Batch size: 32
+Number of GPUs: 1
+Running warmup...
+Running benchmark...
+Iter #0: 1046.7 img/sec per GPU
+Iter #1: 1038.0 img/sec per GPU
+Iter #2: 1069.9 img/sec per GPU
+Iter #3: 1029.5 img/sec per GPU
+Iter #4: 1036.6 img/sec per GPU
+Iter #5: 1086.3 img/sec per GPU
+Iter #6: 1053.1 img/sec per GPU
+Iter #7: 1066.3 img/sec per GPU
+Iter #8: 1045.5 img/sec per GPU
+Iter #9: 1079.9 img/sec per GPU
+Iter #10: 1092.1 img/sec per GPU
+Iter #11: 1049.0 img/sec per GPU
+Iter #12: 1042.9 img/sec per GPU
+Iter #13: 1069.5 img/sec per GPU
+Iter #14: 1047.4 img/sec per GPU
+Iter #15: 1044.7 img/sec per GPU
+Iter #16: 1065.7 img/sec per GPU
+Iter #17: 1032.2 img/sec per GPU
+Iter #18: 1099.5 img/sec per GPU
+Iter #19: 1068.8 img/sec per GPU
+Img/sec per GPU: 1058.2 +-39.0
+Total img/sec on 1 GPU(s): 1058.2 +-39.0

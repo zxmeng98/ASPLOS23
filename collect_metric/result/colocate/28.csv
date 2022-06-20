@@ -1,0 +1,13 @@
+,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+0,TD3,BipedalWalker,1,32,0,15.202,LSTM,Wikitext2,1,64,0,4479.719,73.259,50.953,5940
+1,TD3,BipedalWalker,1,32,0,37.253,LSTM,Wikitext2,1,64,1,4479.525,64.015,45.721,5806
+2,TD3,BipedalWalker,1,32,0,8.556,LSTM,Wikitext2,1,128,0,3812.897,57.106,42.015,7672
+3,TD3,BipedalWalker,1,32,0,27.697,LSTM,Wikitext2,1,128,1,4067.978,62.442,49.942,7376
+4,TD3,BipedalWalker,1,64,0,36.967,LSTM,Wikitext2,1,64,0,4428.337,98.067,72.067,5940
+5,TD3,BipedalWalker,1,64,0,33.72,LSTM,Wikitext2,1,64,1,4380.318,60.629,44.097,5806
+6,TD3,BipedalWalker,1,64,0,29.037,LSTM,Wikitext2,1,128,0,3842.982,58.076,43.136,7672
+7,TD3,BipedalWalker,1,64,0,85.817,LSTM,Wikitext2,1,128,1,4353.201,67.286,54.49,7376
+8,TD3,BipedalWalker,1,128,0,79.727,LSTM,Wikitext2,1,64,0,4417.222,100.0,74.228,5940
+9,TD3,BipedalWalker,1,128,0,119.721,LSTM,Wikitext2,1,64,1,4382.06,72.882,55.824,5806
+10,TD3,BipedalWalker,1,128,0,97.7,LSTM,Wikitext2,1,128,0,3839.557,76.447,59.489,7672
+11,TD3,BipedalWalker,1,128,0,90.195,LSTM,Wikitext2,1,128,1,4188.279,66.321,52.604,7376

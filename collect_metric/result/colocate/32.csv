@@ -1,0 +1,4 @@
+,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+0,Transformer,Multi30k,1,32,0,440.436,Transformer,Multi30k,1,32,0,392.06,77.438,32.0,23294
+1,Transformer,Multi30k,1,32,0,390.003,Transformer,Multi30k,1,64,0,780.704,95.521,48.205,22980
+2,Transformer,Multi30k,1,64,0,627.536,Transformer,Multi30k,1,64,0,641.456,99.264,52.11,23142

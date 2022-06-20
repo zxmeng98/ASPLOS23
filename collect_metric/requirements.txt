@@ -1,0 +1,9 @@
+Box2D
+Box2D-kengz
+swig
+gym
+transformers
+stable_baselines3
+scipy
+torch==1.10.2
+torchvision==0.11.3

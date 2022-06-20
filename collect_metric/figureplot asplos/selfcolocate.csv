@@ -1,0 +1,7 @@
+﻿,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+42,PPO,LunarLander,1,64,0,1,PPO,LunarLander,1,64,0,1,22.818,0.026,4074
+10,NeuMF,MovieLens,1,64,0,0.98,NeuMF,MovieLens,1,64,0,0.986,20.724,4.816,4122
+2,PointNet,ShapeNet,1,64,0,0.973,PointNet,ShapeNet,1,64,0,0.971,16.761,14.627,13496
+25,MobileNetV2,CIFAR-10,1,64,0,0.829,MobileNetV2,CIFAR-10,1,64,0,0.846,97.851,64.081,6076
+52,DCGAN,LSUN,1,64,0,0.685,DCGAN,LSUN,1,64,0,0.685,99.273,44.039,5276
+6,LSTM,Wikitext2,1,64,0,0.563,LSTM,Wikitext2,1,64,0,0.563,100,84.286,7790

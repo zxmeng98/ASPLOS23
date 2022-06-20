@@ -1,0 +1,10 @@
+,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+0,PPO,LunarLander,1,32,0,4.85,TD3,BipedalWalker,1,32,0,15.955,22.104,0.0,4082
+1,PPO,LunarLander,1,32,0,5.335,TD3,BipedalWalker,1,64,0,8.292,22.104,0.03,4082
+2,PPO,LunarLander,1,32,0,5.484,TD3,BipedalWalker,1,128,0,128.809,23.836,0.036,4082
+3,PPO,LunarLander,1,64,0,14.167,TD3,BipedalWalker,1,32,0,46.876,18.974,0.0,4082
+4,PPO,LunarLander,1,64,0,13.548,TD3,BipedalWalker,1,64,0,76.274,20.517,0.022,4082
+5,PPO,LunarLander,1,64,0,15.355,TD3,BipedalWalker,1,128,0,128.055,23.036,0.073,4082
+6,PPO,LunarLander,1,128,0,37.667,TD3,BipedalWalker,1,32,0,35.865,21.481,0.0,4082
+7,PPO,LunarLander,1,128,0,42.785,TD3,BipedalWalker,1,64,0,83.88,24.206,0.032,4082
+8,PPO,LunarLander,1,128,0,36.57,TD3,BipedalWalker,1,128,0,39.923,20.765,0.051,4082

@@ -1,0 +1,7 @@
+,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+0,PPO,LunarLander,1,32,0,5.331,PPO,LunarLander,1,32,0,4.691,21.835,0.025,4074
+1,PPO,LunarLander,1,32,0,5.018,PPO,LunarLander,1,64,0,13.98,21.446,0.027,4074
+2,PPO,LunarLander,1,32,0,5.59,PPO,LunarLander,1,128,0,44.014,25.569,0.028,4074
+3,PPO,LunarLander,1,64,0,13.567,PPO,LunarLander,1,64,0,14.708,21.68,0.027,4074
+4,PPO,LunarLander,1,64,0,15.415,PPO,LunarLander,1,128,0,42.954,24.205,0.014,4074
+5,PPO,LunarLander,1,128,0,37.247,PPO,LunarLander,1,128,0,36.891,22.437,0.0,4074

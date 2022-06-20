@@ -1,0 +1,7 @@
+﻿,model1,dataset1,gpu_num1,batchsize1,amp1,speed1,model2,dataset2,gpu_num2,batchsize2,amp2,speed2,gpu_util,gmem_util,gmem
+666,EfficientNet,CIFAR-10,1,64,0,1.104,PointNet,ShapeNet,1,64,0,1.012,42.431,16.028,9134
+1150,VGG,CIFAR-10,1,64,0,0.818,LSTM,Wikitext2,1,64,0,0.86,100,82.074,6240
+533,MobileNetV3,ImageNet,1,64,0,0.719,DCGAN,LSUN,1,64,0,0.9,77.25,34.855,5646
+1062,TD3,BipedalWalker,1,64,0,0.567,LSTM,Wikitext2,1,64,0,1.023,82.7,57.6,5940
+244,MobileNetV2,CIFAR-10,1,64,0,0.686,DCGAN,LSUN,1,64,0,0.794,98.8,51.96,5614
+751,ResNet18,CIFAR-10,1,64,0,0.657,ResNet18,CIFAR-10,1,64,0,0.661,98.658,68.513,5342
