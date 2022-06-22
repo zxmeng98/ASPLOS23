@@ -1,7 +1,6 @@
 '''
 This script handling the training process.
 '''
-
 import argparse
 import math
 import time
@@ -15,6 +14,12 @@ import transformer.Constants as Constants
 from dataset import TranslationDataset, paired_collate_fn
 from transformer.Models import Transformer
 from transformer.Optim import ScheduledOptim
+import adaptdl
+import adaptdl.torch
+
+from torch.optim.lr_scheduler import ExponentialLR
+from torch.utils.tensorboard import SummaryWriter
+
 
 def cal_performance(pred, gold, smoothing=False):
     ''' Apply label smoothing if needed '''
@@ -218,6 +223,7 @@ def main():
 
     parser.add_argument('-no_cuda', action='store_true')
     parser.add_argument('-label_smoothing', action='store_true')
+    parser.add_argument('--autoscale-bsz', dest='autoscale_bsz', default=True, action='store_true', help='autoscale batchsize')
 
     opt = parser.parse_args()
     opt.cuda = not opt.no_cuda
