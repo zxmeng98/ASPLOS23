@@ -127,6 +127,7 @@ def benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id, bench_list,
     print(f'==> Training {model_name} model with {batch_size} batchsize, {mixed_precision} mp..')
     t_pass, iter_num = benchmark_step()
     img_sec = len(gpu_id) * (iter_num - args.warmup_epoch) * batch_size / t_pass
+    print(img_sec)
   
     # Results
     bench_list.append(img_sec)

@@ -31,33 +31,27 @@ parser.add_argument('--warmup_iter', type=int, default=10, help='number of warmu
 parser.add_argument('--benchmark_epoch', type=int, default=50, help='number of training benchmark epochs')
 parser.add_argument('--data_dir', type=str, default="~/data/", help='Data directory')
 parser.add_argument('--total_time', type=int, default=30, help='Total time to run the code')
+parser.add_argument("--world_size", type=int)
+parser.add_argument("--node_rank", type=int)
 parser.add_argument('--master_addr', type=str, default='127.0.0.1', help='Total time to run the code')
 parser.add_argument('--master_port', type=str, default='47020', help='Total time to run the code')
 
 args = parser.parse_args()
 
 
-# ------ Setting up the distributed environment -------
-def setup(rank, world_size):
-    os.environ['MASTER_ADDR'] = args.master_addr
-    os.environ['MASTER_PORT'] = args.master_port
+def benchmark_cifar_ddp(local_rank, node_rank, local_size, world_size, model_name, batch_size, mixed_precision):
+    t_start = time.time()
     # initialize the process group
-    dist.init_process_group(backend="nccl", rank=rank, world_size=world_size)
+    rank = local_rank + node_rank * local_size
+    dist.init_process_group(backend="nccl", 
+                            init_method="tcp://{}:{}".format(args.master_addr, args.master_port),
+                            rank=rank, 
+                            world_size=world_size)
     # this function is responsible for synchronizing and successfully communicate across multiple process
     # involving multiple GPUs.
 
-
-def cleanup():
-    dist.destroy_process_group()
-
-
-def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(str(i) for i in gpu_id)
-    t_start = time.time()
-    print(f"Running Distributed ResNet on rank {rank}.")
-    setup(rank, len(gpu_id))
+    print(f"Running Distributed ResNet rank {rank} on node {node_rank}.")
     torch.manual_seed(0)
-    torch.cuda.set_device(rank)
 
     # Model
     # print('==> Building model..')
@@ -67,10 +61,10 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
         model = ShuffleNetV2(net_size=0.5)
     else:
         model = eval(model_name)()
-    model.to(rank)
-    model = DDP(model, device_ids=[rank])
+    model.to(local_rank)
+    model = DDP(model, device_ids=[local_rank], output_device=local_rank)
     
-    criterion = nn.CrossEntropyLoss().to(rank)
+    criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=5e-4)
 
     if mixed_precision:
@@ -87,7 +81,7 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
     ])
 
     trainset = torchvision.datasets.CIFAR10(root=args.data_dir, train=True, download=False, transform=transform_train)
-    train_sampler = torch.utils.data.distributed.DistributedSampler(trainset,  rank=rank)
+    train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)
     trainloader = torch.utils.data.DataLoader(trainset, batch_size, num_workers=2, sampler=train_sampler)
     # data, target = next(iter(trainloader))
     # data, target = data.cuda(), target.cuda()
@@ -111,7 +105,7 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
                 break
             optimizer.zero_grad()
             if mixed_precision:
-                inputs, targets = inputs.to(rank), targets.to(rank)
+                inputs, targets = inputs.to(local_rank), targets.to(local_rank)
                 with torch.cuda.amp.autocast():
                     outputs = model(inputs)
                     loss = criterion(outputs, targets)
@@ -119,7 +113,7 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
                 scaler.step(optimizer)
                 scaler.update()
             else:
-                inputs, targets = inputs.to(rank), targets.to(rank)
+                inputs, targets = inputs.to(local_rank), targets.to(local_rank)
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 loss.backward()
@@ -128,16 +122,14 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
         if exit_flag:
             break
 
-    img_sec = len(gpu_id) * (iter_num - args.warmup_iter) * batch_size / t_pass
-    print(f'master port: {args.master_port}, speed: {img_sec}')
-    
-    cleanup()
+    img_sec = local_size * (iter_num - args.warmup_iter) * batch_size / t_pass
+    print(img_sec)
+
 
 if __name__ == '__main__':
-    model_name = 'EfficientNetB0'
-    batch_size = 64
+    model_name = 'ResNet18'
+    batch_size = 32
     mixed_precision = 0
-    gpu_id = [0]
-    # world_size = 4
+    local_size = torch.cuda.device_count()
 
-    mp.spawn(benchmark_cifar_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, ), nprocs=len(gpu_id), join=True)
+    mp.spawn(benchmark_cifar_ddp, args=(args.node_rank, local_size, args.world_size, model_name, batch_size, mixed_precision, ), nprocs=local_size, join=True)

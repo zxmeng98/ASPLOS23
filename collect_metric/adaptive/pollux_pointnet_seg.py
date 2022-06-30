@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--workers', type=int, help='number of data loading workers', default=4)
 parser.add_argument(
-    '--nepoch', type=int, default=25, help='number of epochs to train for')
+    '--nepoch', type=int, default=150, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='model path')
 parser.add_argument('--dataset', type=str, default="/home/mzhang/data/shapenetcore/", help="dataset path")
 parser.add_argument('--dataset_type', type=str, default='shapenet', help="dataset type shapenet|modelnet40")
@@ -66,7 +66,7 @@ else:
 print('==> Preparing data..')
 dataloader = adaptdl.torch.AdaptiveDataLoader(dataset, batch_size=opt.batchSize, shuffle=True, num_workers=int(opt.workers), drop_last=True)
 if opt.autoscale_bsz:
-    dataloader.autoscale_batch_size(4096, local_bsz_bounds=(8, 1024), gradient_accumulation=True)
+    dataloader.autoscale_batch_size(4096, local_bsz_bounds=(8, 100), gradient_accumulation=True)
 testdataloader = adaptdl.torch.AdaptiveDataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=int(opt.workers))
 
 # testdataloader = torch.utils.data.DataLoader(

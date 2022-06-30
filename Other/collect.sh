@@ -17,3 +17,8 @@ CUDA_VISIBLE_DEVICES=0 python profile.py
 CUDA_VISIBLE_DEVICES=0 python profile_cifar.py & 
 CUDA_VISIBLE_DEVICES=0 python profile_cifar.py &
 python gpu_meter.py 
+
+
+python profile_cifar_ddp.py & python profile_cifar_ddp.py --master_port 12335
+
+python profile_imagenet_ddp.py & python profile_imagenet_ddp.py --master_port 12335

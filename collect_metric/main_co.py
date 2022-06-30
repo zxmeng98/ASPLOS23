@@ -21,12 +21,14 @@ from co_collect import collect
 
 
 mlist_imagenet = ['resnet50', 'mobilenet_v3_small']
-mlist_cifar = ['ResNet18', 'MobileNetV2', 'EfficientNetB0', 'VGG']
+# mlist_cifar = ['ResNet18', 'MobileNetV2', 'EfficientNetB0', 'VGG']
+mlist_cifar = ['VGG']
 bs_list = [32, 64, 128]
 bs_list1 = [32, 64]
 gpu_id = [0]
 
 os.makedirs('result/colocate/', exist_ok=True)
+os.makedirs('result/vgg/', exist_ok=True)
 t_begin = time.time()
 
 # # colocate: imagenet + imagenet
@@ -71,41 +73,41 @@ t_begin = time.time()
 # df = pd.DataFrame(metric_list7)
 # df.to_csv('./result/colocate/7.csv')
 
-# # colocate: cifar10 + cifar10
-# print('cifar10 + cifar10')
-# metric_list8 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, gpu_id)
-# df = pd.DataFrame(metric_list8)
-# df.to_csv('./result/colocate/8.csv')
+# colocate: cifar10 + cifar10
+print('cifar10 + cifar10')
+metric_list8 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, gpu_id)
+df = pd.DataFrame(metric_list8)
+df.to_csv('./result/vgg/8.csv')
 
-# # colocate: cifar10 + pointnet
-# print('cifar10 + pointnet')
-# metric_list9 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_pointnet, ['PointNet'], 'ShapeNet', bs_list, gpu_id)
-# df = pd.DataFrame(metric_list9)
-# df.to_csv('./result/colocate/9.csv')
+# colocate: cifar10 + pointnet
+print('cifar10 + pointnet')
+metric_list9 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_pointnet, ['PointNet'], 'ShapeNet', bs_list, gpu_id)
+df = pd.DataFrame(metric_list9)
+df.to_csv('./result/vgg/9.csv')
 
-# # colocate: cifar10 + dcgan
-# print('cifar10 + dcgan')
-# metric_list10 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_dcgan, ['DCGAN'], 'LSUN', bs_list, gpu_id)
-# df = pd.DataFrame(metric_list10)
-# df.to_csv('./result/colocate/10.csv')
+# colocate: cifar10 + dcgan
+print('cifar10 + dcgan')
+metric_list10 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_dcgan, ['DCGAN'], 'LSUN', bs_list, gpu_id)
+df = pd.DataFrame(metric_list10)
+df.to_csv('./result/vgg/10.csv')
 
-# # colocate: cifar10 + rl
-# print('cifar10 + rl')
-# metric_list11 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_rl, ['PPO'], 'LunarLander', bs_list, gpu_id)
-# df = pd.DataFrame(metric_list11)
-# df.to_csv('./result/colocate/11.csv')
+# colocate: cifar10 + rl
+print('cifar10 + rl')
+metric_list11 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_rl, ['PPO'], 'LunarLander', bs_list, gpu_id)
+df = pd.DataFrame(metric_list11)
+df.to_csv('./result/vgg/11.csv')
 
-# # colocate: cifar10 + rl2
-# print('cifar10 + rl2')
-# metric_list12 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_rl2, ['TD3'], 'BipedalWalker', bs_list, gpu_id)
-# df = pd.DataFrame(metric_list12)
-# df.to_csv('./result/colocate/12.csv')
+# colocate: cifar10 + rl2
+print('cifar10 + rl2')
+metric_list12 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_rl2, ['TD3'], 'BipedalWalker', bs_list, gpu_id)
+df = pd.DataFrame(metric_list12)
+df.to_csv('./result/vgg/12.csv')
 
-# # colocate: cifar10 + lstm
-# print('cifar10 + lstm')
-# metric_list13 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_lstm, ['LSTM'], 'Wikitext2', [64, 128], gpu_id)
-# df = pd.DataFrame(metric_list13)
-# df.to_csv('./result/colocate/13.csv')
+# colocate: cifar10 + lstm
+print('cifar10 + lstm')
+metric_list13 = collect(benchmark_cifar, mlist_cifar, 'CIFAR-10', bs_list, benchmark_lstm, ['LSTM'], 'Wikitext2', [64, 128], gpu_id)
+df = pd.DataFrame(metric_list13)
+df.to_csv('./result/vgg/13.csv')
 
 # # colocate: pointnet + pointnet
 # print('pointnet + pointnet')
@@ -209,11 +211,11 @@ t_begin = time.time()
 # df = pd.DataFrame(metric_list30)
 # df.to_csv('./result/colocate/30.csv')
 
-# colocate: ncf + mobilenetv3
-print('ncf + mobilenetv3')
-metric_list31 = collect(benchmark_ncf, ['NeuMF-pre'], 'MovieLens', [64, 128], benchmark_imagenet, mlist_imagenet, 'ImageNet', bs_list, gpu_id)
-df = pd.DataFrame(metric_list31)
-df.to_csv('./result/colocate/31.csv')
+# # colocate: ncf + mobilenetv3
+# print('ncf + mobilenetv3')
+# metric_list31 = collect(benchmark_ncf, ['NeuMF-pre'], 'MovieLens', [64, 128], benchmark_imagenet, mlist_imagenet, 'ImageNet', bs_list, gpu_id)
+# df = pd.DataFrame(metric_list31)
+# df.to_csv('./result/colocate/31.csv')
 
 # # colocate: transformer + transformer
 # print('transformer + transformer')

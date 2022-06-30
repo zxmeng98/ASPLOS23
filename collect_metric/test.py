@@ -15,6 +15,7 @@ from multiprocessing import Process, Manager, Value
 from workloads.lstm.profile_lstm import benchmark_lstm
 from workloads.imagenet.profile_imagenet import benchmark_imagenet
 from workloads.cifar.profile_cifar import benchmark_cifar
+from workloads.cifar.profile_cifar_ddp import train_cifar_ddp
 from workloads.pointnet.profile_pointnet import benchmark_pointnet
 from workloads.dcgan.profile_dcgan import benchmark_dcgan
 from workloads.rl.profile_rl_lunarlander import benchmark_rl
@@ -33,11 +34,11 @@ from co_collect import collect
 bs_list = [32, 64]
 
 metric_list = []
-model_name1 = 'resnet50'
-model_name2 = 'resnet50'
-batch_size1 = 128
-batch_size2 = 64
-gpu_id = [0]
+model_name1 = 'resnet18'
+model_name2 = 'resnet18'
+batch_size1 = 32
+batch_size2 = 32
+gpu_id = [0,1]
 
 start_record = time.time()
 with Manager() as manager:
@@ -47,8 +48,8 @@ with Manager() as manager:
     signal1 = Value('i', 0)
     signal2 = Value('i', 0)
 
-    p1 = Process(target=benchmark_imagenet, args=(model_name1, batch_size1, 0, gpu_id, speed_list1, signal1, ))
-    p2 = Process(target=benchmark_imagenet, args=(model_name2, batch_size2, 0, gpu_id, speed_list2, signal2, ))
+    p1 = Process(target=train_cifar_ddp, args=(model_name1, batch_size1, 0, gpu_id, speed_list1, signal1, 2, ))
+    p2 = Process(target=train_cifar_ddp, args=(model_name2, batch_size2, 0, gpu_id, speed_list2, signal2, 2, ))
     p3 = Process(target=smi_getter, args=(sys.argv[1:], smi_list, gpu_id, ))
 
     p1.start()

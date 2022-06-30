@@ -34,6 +34,7 @@ parser.add_argument('--total_time', type=int, default=30, help='Total time to ru
 parser.add_argument('--master_addr', type=str, default='127.0.0.1', help='Total time to run the code')
 parser.add_argument('--master_port', type=str, default='47020', help='Total time to run the code')
 
+
 args = parser.parse_args()
 
 
@@ -51,7 +52,7 @@ def cleanup():
     dist.destroy_process_group()
 
 
-def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
+def benchmark_imagenet_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(str(i) for i in gpu_id)
     t_start = time.time()
     print(f"Running Distributed ResNet on rank {rank}.")
@@ -61,12 +62,7 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
 
     # Model
     # print('==> Building model..')
-    if model_name == 'VGG':
-        model = VGG('VGG11')
-    elif model_name == 'ShuffleNetV2': 
-        model = ShuffleNetV2(net_size=0.5)
-    else:
-        model = eval(model_name)()
+    model = getattr(torchvision.models, model_name)()
     model.to(rank)
     model = DDP(model, device_ids=[rank])
     
@@ -79,65 +75,52 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
         scaler = None
 
     # Dataset
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ])
+    data = torch.randn(batch_size, 3, 224, 224)
+    target = torch.LongTensor(batch_size).random_() % 1000
+    data, target = data.to(rank), target.to(rank)
 
-    trainset = torchvision.datasets.CIFAR10(root=args.data_dir, train=True, download=False, transform=transform_train)
-    train_sampler = torch.utils.data.distributed.DistributedSampler(trainset,  rank=rank)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size, num_workers=2, sampler=train_sampler)
     # data, target = next(iter(trainloader))
     # data, target = data.cuda(), target.cuda()
 
     # Train
     print(f'==> Training {model_name} model with {batch_size} batchsize, {mixed_precision} mp..')
     iter_num = 0
-    exit_flag = False
     model.train()
     # Prevent total batch number < warmup+benchmark situation
     while True:
-        for inputs, targets in trainloader:
-            # Warm-up: previous 10 iters
-            if iter_num == args.warmup_iter-1:
-                t_warmend = time.time()
-            # Reach timeout: exit benchmark
-            if time.time() - t_start >= args.total_time:
-                t_end = time.time()
-                t_pass = t_end - t_warmend
-                exit_flag = True
-                break
-            optimizer.zero_grad()
-            if mixed_precision:
-                inputs, targets = inputs.to(rank), targets.to(rank)
-                with torch.cuda.amp.autocast():
-                    outputs = model(inputs)
-                    loss = criterion(outputs, targets)
-                scaler.scale(loss).backward()
-                scaler.step(optimizer)
-                scaler.update()
-            else:
-                inputs, targets = inputs.to(rank), targets.to(rank)
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                loss.backward()
-                optimizer.step()
-            iter_num += 1
-        if exit_flag:
+        # Warm-up: previous 10 iters
+        if iter_num == args.warmup_iter-1:
+            t_warmend = time.time()
+        # Reach timeout: exit benchmark
+        if time.time() - t_start >= args.total_time:
+            t_end = time.time()
+            t_pass = t_end - t_warmend
             break
+        optimizer.zero_grad()
+        if mixed_precision:
+            with torch.cuda.amp.autocast():
+                output = model(data)
+                loss = criterion(output, target)
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            output = model(data)
+            loss = criterion(output, target)
+            loss.backward()
+            optimizer.step()
+        iter_num += 1
 
     img_sec = len(gpu_id) * (iter_num - args.warmup_iter) * batch_size / t_pass
     print(f'master port: {args.master_port}, speed: {img_sec}')
-    
+
     cleanup()
 
 if __name__ == '__main__':
-    model_name = 'EfficientNetB0'
+    model_name = 'mobilenet_v3_small'
     batch_size = 64
     mixed_precision = 0
     gpu_id = [0]
     # world_size = 4
 
-    mp.spawn(benchmark_cifar_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, ), nprocs=len(gpu_id), join=True)
+    mp.spawn(benchmark_imagenet_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, ), nprocs=len(gpu_id), join=True)

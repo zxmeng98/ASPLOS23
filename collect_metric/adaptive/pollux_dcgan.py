@@ -208,8 +208,8 @@ scheduleG = optim.lr_scheduler.StepLR(optimizerG, 15, 1)
 
 adaptdl.torch.init_process_group("nccl" if torch.cuda.is_available()
                                      else "gloo")
-# netD = adl.AdaptiveDataParallel(netD, optimizerD, scheduleD, name="netD")
-# netG = adl.AdaptiveDataParallel(netG, optimizerG, scheduleG, name="netG")
+netD = adl.AdaptiveDataParallel(netD, optimizerD, scheduleD, name="netD")
+netG = adl.AdaptiveDataParallel(netG, optimizerG, scheduleG, name="netG")
 
 # Training Loop
 
