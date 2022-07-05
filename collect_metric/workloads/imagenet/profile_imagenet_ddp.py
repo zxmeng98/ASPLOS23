@@ -52,9 +52,8 @@ def cleanup():
     dist.destroy_process_group()
 
 
-def benchmark_imagenet_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
+def benchmark_imagenet_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t_start):
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(str(i) for i in gpu_id)
-    t_start = time.time()
     print(f"Running Distributed ResNet on rank {rank}.")
     setup(rank, len(gpu_id))
     torch.manual_seed(0)
@@ -112,15 +111,16 @@ def benchmark_imagenet_ddp(rank, model_name, batch_size, mixed_precision, gpu_id
         iter_num += 1
 
     img_sec = len(gpu_id) * (iter_num - args.warmup_iter) * batch_size / t_pass
-    print(f'master port: {args.master_port}, speed: {img_sec}')
+    if rank == 0:
+        print(f'master port: {args.master_port}, speed: {img_sec}')
 
     cleanup()
 
 if __name__ == '__main__':
-    model_name = 'mobilenet_v3_small'
+    model_name = 'resnet50'
     batch_size = 64
     mixed_precision = 0
-    gpu_id = [0]
+    gpu_id = [0,1,2,3]
     # world_size = 4
-
-    mp.spawn(benchmark_imagenet_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, ), nprocs=len(gpu_id), join=True)
+    t_start = time.time()
+    mp.spawn(benchmark_imagenet_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, t_start, ), nprocs=len(gpu_id), join=True)

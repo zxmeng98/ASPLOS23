@@ -14,7 +14,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 sys.path.append('../')
 from models import *
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1,2'
+# os.environ["CUDA_VISIBLE_DEVICES"] = '1,2'
 
 # ------ Setting up the distributed environment -------
 def setup(rank, world_size):
@@ -135,7 +135,7 @@ def run_train_model(train_func, world_size):
     parser.add_argument('--world_size', type=int, default=world_size, help='total number of processes')
     parser.add_argument('--lr', default=0.01, type=float, help='Default Learning Rate')
     parser.add_argument('--batch_size', type=int, default=64, help='size of the batches')
-    parser.add_argument('--n_epochs', type=int, default=150, help='Total number of epochs for training')
+    parser.add_argument('--n_epochs', type=int, default=30, help='Total number of epochs for training')
     args = parser.parse_args()
     print(args)
 
@@ -147,7 +147,7 @@ def run_train_model(train_func, world_size):
 if __name__ == "__main__":
     # since this example shows a single process per GPU, the number of processes is simply replaced with the
     # number of GPUs available for training.
-    # n_gpus = torch.cuda.device_count()
-    n_gpus = 2
+    n_gpus = torch.cuda.device_count()
+    # n_gpus = 2
     run_train_model(train_model, n_gpus)
 

@@ -1,25 +1,15 @@
 from __future__ import print_function
 import argparse
-import timeit
-from cvxpy import mixed_norm
-import torch.backends.cudnn as cudnn
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data.distributed
 import torch.distributed as dist
 import sys
-import numpy as np
 import os
-import pandas as pd
 import torchvision
-import time
 import torch.multiprocessing as mp
-import csv
 sys.path.append('/home/mzhang/work/ASPLOS23/collect_metric/')
 
-from torch.nn import DataParallel
-from multiprocessing import Process, Manager, Value
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torchvision import transforms
 from models import *
@@ -28,12 +18,13 @@ from models import *
 parser = argparse.ArgumentParser(
     description="PyTorch DP Synthetic Benchmark", formatter_class=argparse.ArgumentDefaultsHelpFormatter
 )
-parser.add_argument('--warmup_iter', type=int, default=20, help='number of warmup epochs')
+parser.add_argument('--warmup_iter', type=int, default=10, help='number of warmup epochs')
 parser.add_argument('--benchmark_epoch', type=int, default=50, help='number of training benchmark epochs')
 parser.add_argument('--data_dir', type=str, default="~/data/", help='Data directory')
-parser.add_argument('--total_time', type=int, default=50, help='Total time to run the code')
+parser.add_argument('--total_time', type=int, default=30, help='Total time to run the code')
 parser.add_argument('--master_addr', type=str, default='127.0.0.1', help='Total time to run the code')
 parser.add_argument('--master_port', type=str, default='47020', help='Total time to run the code')
+parser.add_argument('--n_epochs', type=int, default=2, help='Total number of epochs for training')
 
 args = parser.parse_args()
 
@@ -52,7 +43,7 @@ def cleanup():
     dist.destroy_process_group()
 
 
-def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t_start):
+def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id):
     print(f"Running Distributed ResNet on rank {rank}.")
     setup(rank, len(gpu_id))
     torch.manual_seed(0)
@@ -85,7 +76,7 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
-    trainset = torchvision.datasets.CIFAR10(root=args.data_dir, train=True, download=False, transform=transform_train)
+    trainset = torchvision.datasets.CIFAR10(root=args.data_dir, train=True, download=True, transform=transform_train)
     train_sampler = torch.utils.data.distributed.DistributedSampler(trainset,  rank=rank)
     trainloader = torch.utils.data.DataLoader(trainset, batch_size, num_workers=2, sampler=train_sampler)
     # data, target = next(iter(trainloader))
@@ -93,21 +84,12 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t
 
     # Train
     print(f'==> Training {model_name} model with {batch_size} batchsize, {mixed_precision} mp..')
-    iter_num = 0
     exit_flag = False
     model.train()
     # Prevent total batch number < warmup+benchmark situation
-    while True:
+    for epoch in range(args.n_epochs):
+        iter_num = 0
         for inputs, targets in trainloader:
-            # Warm-up: previous 10 iters
-            if iter_num == args.warmup_iter-1:
-                t_warmend = time.time()
-            # Reach timeout: exit benchmark
-            if time.time() - t_start >= args.total_time:
-                t_end = time.time()
-                t_pass = t_end - t_warmend
-                exit_flag = True
-                break
             optimizer.zero_grad()
             if mixed_precision:
                 inputs, targets = inputs.to(rank), targets.to(rank)
@@ -124,19 +106,11 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t
                 loss.backward()
                 optimizer.step()
             iter_num += 1
-        if exit_flag:
-            break
+        if epoch == 1: 
+            print('End warmup')
 
-    
-    img_sec = len(gpu_id) * (iter_num - args.warmup_iter) * batch_size / t_pass
-    if rank == 0: 
-        print(f'master port: {args.master_port}, speed: {img_sec}')
-    # if rank == 2:
-    #     path = model_name + '_' + str(len(gpu_id)) + 'gpu'
-    #     with open(path,'a',newline='') as file:
-    #         writer = csv.writer(file)
-    #         writer.writerow([img_sec])
-
+    img_sec = len(gpu_id) * iter_num * (args.n_epochs-2) * batch_size
+    print(f'End master port: {args.master_port}, images: {img_sec}')
     
     cleanup()
 
@@ -145,8 +119,7 @@ if __name__ == '__main__':
     batch_size = 64
     mixed_precision = 0
     gpu_id = [0,1,2,3]
-
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(str(i) for i in gpu_id)
     # world_size = 4
-    t_start = time.time()
-    mp.spawn(benchmark_cifar_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, t_start, ), nprocs=len(gpu_id), join=True)
+
+    mp.spawn(benchmark_cifar_ddp, args=(model_name, batch_size, mixed_precision, gpu_id, ), nprocs=len(gpu_id), join=True)

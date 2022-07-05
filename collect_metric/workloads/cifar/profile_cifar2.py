@@ -10,8 +10,10 @@ import numpy as np
 import os
 import torchvision
 import time
+import sys
 from torch.nn import DataParallel
 from torchvision import transforms
+sys.path.append('/home/mzhang/work/ASPLOS23/collect_metric/')
 
 from models import *
 import workloads.settings as settings
@@ -39,7 +41,7 @@ args = parser.parse_args()
 # args.data_dir = settings.data_dir
 # args.total_time = settings.total_time
 
-def benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id, bench_list, warm_signal):
+def benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id):
     t_start = time.time()
     if len(gpu_id) == 1:
         os.environ["CUDA_VISIBLE_DEVICES"] = f"{gpu_id[0]}"
@@ -96,7 +98,6 @@ def benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id, bench_list,
             for inputs, targets in trainloader:
                 # Warm-up: previous 10 iters
                 if iter_num == args.warmup_epoch-1:
-                    warm_signal.value = 1
                     t_warmend = time.time()
                 # Reach timeout: exit profiling
                 if time.time() - t_start >= args.total_time:
@@ -129,8 +130,6 @@ def benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id, bench_list,
     img_sec = (iter_num - args.warmup_epoch) * batch_size / t_pass
     print(img_sec)
   
-    # Results
-    bench_list.append(img_sec)
 
 if __name__ == "__main__":
     # since this example shows a single process per GPU, the number of processes is simply replaced with the
@@ -139,4 +138,4 @@ if __name__ == "__main__":
     batch_size = 64
     mixed_precision = 0
     gpu_id = [0,1,2,3]
-    benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id, bench_list, warm_signal)
+    benchmark_cifar(model_name, batch_size, mixed_precision, gpu_id)
