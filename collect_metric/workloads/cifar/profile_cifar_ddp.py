@@ -1,10 +1,6 @@
 from __future__ import print_function
 import argparse
-import timeit
-from cvxpy import mixed_norm
-import torch.backends.cudnn as cudnn
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data.distributed
 import torch.distributed as dist
@@ -31,9 +27,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--warmup_iter', type=int, default=20, help='number of warmup epochs')
 parser.add_argument('--benchmark_epoch', type=int, default=50, help='number of training benchmark epochs')
 parser.add_argument('--data_dir', type=str, default="~/data/", help='Data directory')
-parser.add_argument('--total_time', type=int, default=50, help='Total time to run the code')
-parser.add_argument('--master_addr', type=str, default='127.0.0.1', help='Total time to run the code')
-parser.add_argument('--master_port', type=str, default='47020', help='Total time to run the code')
+parser.add_argument('--total_time', type=int, default=60, help='Total time to run the code')
+parser.add_argument('--master_addr', type=str, default='127.0.0.1', help='Master node address')
+parser.add_argument('--master_port', type=str, default='47020', help='Master node port')
 
 args = parser.parse_args()
 
@@ -53,7 +49,7 @@ def cleanup():
 
 
 def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t_start):
-    print(f"Running Distributed ResNet on rank {rank}.")
+    print(f"Running Distributed Training on rank {rank}.")
     setup(rank, len(gpu_id))
     torch.manual_seed(0)
     torch.cuda.set_device(rank)
@@ -85,7 +81,7 @@ def benchmark_cifar_ddp(rank, model_name, batch_size, mixed_precision, gpu_id, t
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
-    trainset = torchvision.datasets.CIFAR10(root=args.data_dir, train=True, download=False, transform=transform_train)
+    trainset = torchvision.datasets.CIFAR10(root=args.data_dir, train=True, download=True, transform=transform_train)
     train_sampler = torch.utils.data.distributed.DistributedSampler(trainset,  rank=rank)
     trainloader = torch.utils.data.DataLoader(trainset, batch_size, num_workers=2, sampler=train_sampler)
     # data, target = next(iter(trainloader))
